@@ -26,8 +26,12 @@
 					placeholder="Ketik pesan..." 
 					class="chat-input"
 					/>
-					<button @click="sendMessage" class="send-button" v-if="!isTyping">Kirim</button>
-					<button @click="stopMessage" class="pause-button" v-else-if="isTyping && !isPaused">Pause</button>
+					<button @click="sendMessage" class="send-button" v-if="!isTyping">
+						<Send size="20" stroke-width="2" />
+					</button>
+					<button @click="stopMessage" class="pause-button" v-else-if="isTyping && !isPaused">
+						<Pause size="20" stroke-width="2" />
+					</button>
 				</div>
 			</div>
 		</div>
@@ -39,6 +43,8 @@ import { ref, onMounted, nextTick } from 'vue';
 import axios from 'axios';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
+import { Send, Pause } from "lucide-vue-next";
+import { cleanHTML } from '@/functions/general';
 
 const conversation = ref([]);
 const userMessage = ref('');
@@ -63,12 +69,14 @@ const typeMessage = async (text) => {
 	for (let i = 0; i < text.length; i++) {
 		// console.log(text[i]);
 		if(isPaused.value){
+			conversation.value[conversation.value.length - 1].content = cleanHTML(conversation.value[conversation.value.length - 1].content);
+			console.log(conversation.value[conversation.value.length - 1]);
 			break;
 		}
 		typedText += text[i];
 		conversation.value[conversation.value.length - 1].content = typedText + (i < (text.length - 1) ? typeChar(15) : '');
 		await new Promise((resolve) => setTimeout(resolve, 30)); // Kecepatan efek
-		if((chatBox.value.scrollTop + chatBox.value.clientHeight) + 75 >= (chatBox.value.scrollHeight)){
+		if(((chatBox.value.scrollTop + chatBox.value.clientHeight) + (chatBox.value.clientHeight < 200 ? 50 : 75)) >= (chatBox.value.scrollHeight)){
 			scrollToBottom();
 		}
 	}
@@ -76,38 +84,38 @@ const typeMessage = async (text) => {
 };
 
 const sendMessage = async () => {
-  if (userMessage.value.trim()) {
-    conversation.value.push({ role: 'user', content: userMessage.value });
-    userMessage.value = '';
-    isWaiting.value = true;
-    isTyping.value = true;
-    isPaused.value = false;
-    scrollToBottom();
+	if (userMessage.value.trim() && (!isWaiting.value && !isTyping.value)) {
+		conversation.value.push({ role: 'user', content: userMessage.value });
+		userMessage.value = '';
+		isWaiting.value = true;
+		isTyping.value = true;
+		isPaused.value = false;
+		scrollToBottom();
 
-    try {
-		const response = await axios.post(
-		'https://api.mistral.ai/v1/chat/completions',
-		{
-			model: 'mistral-large-latest',
-			messages: cleanConversation(conversation.value),
-			temperature: 0.7,
-			max_tokens: 1000
-		},
-		{
-			headers: { 'Authorization': `Bearer ${process.env.VUE_APP_MISTRAL_API_KEY}` }
+		try {
+			const response = await axios.post(
+			'https://api.mistral.ai/v1/chat/completions',
+			{
+				model: 'mistral-large-latest',
+				messages: cleanConversation(conversation.value),
+				temperature: 0.7,
+				max_tokens: 1000
+			},
+			{
+				headers: { 'Authorization': `Bearer ${process.env.VUE_APP_MISTRAL_API_KEY}` }
+			}
+			);
+
+			const assistantResponse = response.data.choices[0].message.content;
+			conversation.value.push({ role: 'assistant', content: "" }); // Awal teks kosong
+			isWaiting.value = false;
+			await typeMessage(assistantResponse);
+		} catch (error) {
+			console.error('Error sending message:', error);
+			conversation.value.push({ role: 'assistant', content: 'Maaf, terjadi kesalahan.' });
+			isTyping.value = false;
 		}
-		);
-
-		const assistantResponse = response.data.choices[0].message.content;
-		conversation.value.push({ role: 'assistant', content: "" }); // Awal teks kosong
-		isWaiting.value = false;
-		await typeMessage(assistantResponse);
-    } catch (error) {
-		console.error('Error sending message:', error);
-		conversation.value.push({ role: 'assistant', content: 'Maaf, terjadi kesalahan.' });
-		isTyping.value = false;
-    }
-  }
+	}
 };
 
 const formatMessage = (content) => {
@@ -117,7 +125,7 @@ function typeChar(n) {
     counter++;
     if (counter === n) {
         counter = 0;  // Reset counter setelah 5 input
-		return ' _<span class="typing-indicator" style="font-size: 10px; padding: 5px; border-radius: 0; background: #ddd;"></span>';
+		return '_<span class="typing-indicator" style="font-size: 10px; padding: 5px; border-radius: 0; background: #000;"></span>';
     }
 	return '';
 }
@@ -232,8 +240,10 @@ onMounted(() => {
 	}
 
 	.send-button {
-		background-color: #5c9ded;
-		color: white;
+		display: flex;
+		align-items: center;
+		background-color: none;
+		color: #5c9ded;
 		padding: 10px 15px;
 		border: none;
 		border-radius: 5px;
@@ -243,7 +253,7 @@ onMounted(() => {
 	}
 
 	.send-button:hover {
-		background-color: #4785bb;
+		background-color: #c2c2c2;
 	}
 	.pause-button {
 		background-color: #474747;

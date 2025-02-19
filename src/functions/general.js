@@ -65,3 +65,9 @@ export function setPageData(data){
         }
     }
 }
+export function cleanHTML(html) {
+    if (typeof html !== "string") {
+        return "";
+    }
+    return html.replace(/<\/?[^>]+(>|$)/g, "");
+}

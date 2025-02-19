@@ -12,6 +12,7 @@
     "core-js": "^3.8.3",
     "dompurify": "^3.2.4",
     "dotenv": "^16.4.7",
+    "lucide-vue-next": "^0.475.0",
     "marked": "^15.0.7",
     "pinia": "^3.0.1",
     "vue": "^3.2.13",
