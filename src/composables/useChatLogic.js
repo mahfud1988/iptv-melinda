@@ -25,7 +25,6 @@ export function useChatLogic() {
     const typeMessage = async (text) => {
         let typedText = "";
         for (let i = 0; i < text.length; i++) {
-            // console.log(text[i]);
             if(isPaused.value){
                 conversation.value[conversation.value.length - 1].content = cleanHTML(conversation.value[conversation.value.length - 1].content);
                 console.log(conversation.value[conversation.value.length - 1]);
@@ -41,13 +40,7 @@ export function useChatLogic() {
         isTyping.value = false;
     };
 
-    // const sendMessage = () => {
-    //     if (!userMessage.value.trim()) return;
-    //     conversation.value.push({ text: userMessage.value, sender: "user" });
-    //     userMessage.value = "";
-    // };
     const sendMessage = async () => {
-        // console.log('Chatbox: ' + chatBox.value);
         if (userMessage.value.trim() && (!isWaiting.value && !isTyping.value)) {
             conversation.value.push({ role: 'user', content: userMessage.value });
             userMessage.value = '';
@@ -89,7 +82,7 @@ export function useChatLogic() {
     function typeChar(n) {
         counter++;
         if (counter === n) {
-            counter = 0;  // Reset counter setelah 5 input
+            counter = 0;
             return '_<span class="typing-indicator" style="font-size: 10px; padding: 5px; border-radius: 0; background: #000;"></span>';
         }
         return '_';
@@ -111,17 +104,8 @@ export function useChatLogic() {
                 cleaned.pop();
             }
         }
-        // console.log(cleaned);
         return cleaned;
     }
-
-    // const stopMessage = () => {
-    //     isPaused.value = true;
-    // };
-
-    // const formatMessage = (message) => {
-    //     return message.trim();
-    // };
 
     return {
         conversation,
