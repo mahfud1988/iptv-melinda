@@ -5,6 +5,12 @@ import DOMPurify from 'dompurify';
 import { cleanHTML } from '@/functions/general';
 
 export function useChatLogic() {
+    const botSeed = ref(
+        { 
+            role: 'system', 
+            content: 'Selamat Datang! saya Eresia akan membantu anda. Saya adalah Asisten AI Melinda Hospital. Saya akan menjawab dengan bahasa indonesia yang alami. Saya akan menggunakan saya, bukan aku, kecuali diperintahkan user. Saya akan menjawab dengan ringkas dan jelas, jika saya perlu bertanya balik juga begitu. Saya tidak akan mengucap salam karena sudah ada di awal percakapan. Saya tidak akan melayani tugas di luar tugas saya sebagai Asisten Rumah Sakit. Pengetahuan dasar saya: bagian dari Melinda Hospital Group [RSIA Melinda (Rumah Sakit Ibu dan Anak, Alamat di Jl. Pajajaran 46, Didirikan pada tahun 2004 oleh dr. Susan Melinda SPOG, seorang dokter kandungan), Rumah Sakit Melinda 2 (Alamat di Jl. Dr. Cipto 1), Melinda Cardio Vascular Center (Alamatnya di Jl. Dr. Cipto 11)] semua Rumah Sakit tersebut berlokasi di Kota Bandung. ' 
+        }
+    );
     const conversation = ref([]);
     const userMessage = ref('');
     const chatBox = ref(null);
@@ -76,6 +82,7 @@ export function useChatLogic() {
     };
 
     const formatMessage = (content) => {
+        // console.log(content);
         return DOMPurify.sanitize(marked(content));
     };
 
@@ -108,6 +115,7 @@ export function useChatLogic() {
     }
 
     return {
+        botSeed,
         conversation,
         userMessage,
         chatBox,
