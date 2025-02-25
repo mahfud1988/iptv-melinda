@@ -10,12 +10,14 @@
           <h2>{{ patient.name }}</h2>
           <p><strong>Usia:</strong> {{ patient.age }} tahun</p>
           <p><strong>Penyakit:</strong> {{ patient.disease }}</p>
+          <p><strong>Ruangan:</strong> {{ patient.room }}</p>
+          <p><strong>Dokter:</strong> {{ patient.doctor }}</p>
+          <p><strong>Perawat:</strong> {{ patient.nurse }}</p>
         </div>
   
         <div class="disease-description card">
           <h3>Uraian Penyakit:</h3>
-          <div class="disease-text">
-            <p v-for="(desc, index) in diseaseDescriptions" :key="index">{{ desc }}</p>
+          <div class="disease-text" v-html="formatMessage(diseaseDescription)">
           </div>
         </div>
       </div>
@@ -31,7 +33,12 @@
     import { ref, onMounted } from 'vue';
     import { useRoute, useRouter } from 'vue-router';  // Untuk akses parameter route
     import { usePatientStore } from '@/stores/patient';
-  
+    import generateDiseaseDescription from '@/composables/generateDiseaseDescription';
+    import { marked } from 'marked';
+    import DOMPurify from 'dompurify';
+
+    const diseaseDescription = ref('Memuat deskripsi...');
+
     // Mengambil parameter route
     const route = useRoute();
     const patientId = parseInt(route.params.patientId);  // Ambil patientId dari URL
@@ -46,14 +53,13 @@
   
     // Menyimpan data pasien berdasarkan patientId
     const patient = ref(null);
-    const diseaseDescriptions = ref([]);
   
     // Fungsi untuk mengambil data pasien
     const fetchPatientData = async () => {
       try {
         patient.value = store.getPatientById(patientId);
         if (patient.value) {
-          diseaseDescriptions.value = patient.value.diseaseDescription || [];
+          diseaseDescription.value = await generateDiseaseDescription(patient.value.disease);
         } else {
           throw new Error("Data pasien tidak ditemukan");
         }
@@ -63,6 +69,9 @@
       } finally {
         loading.value = false;
       }
+    };
+    const formatMessage = (content) => {
+        return DOMPurify.sanitize(marked(content));
     };
   
     onMounted(() => {
@@ -121,12 +130,20 @@
       font-size: 16px;
       color: #7f8c8d;
     }
+    .patient-info{
+      max-width: 500px;
+    }
   
     .disease-description {
       background-color: #ecf0f1;
       padding: 20px;
       border-radius: 8px;
       margin-top: 30px;
+    }
+    .disease-text{
+      display: flex;
+      flex-direction: column;
+      align-self: start;
     }
   
     .disease-text p {

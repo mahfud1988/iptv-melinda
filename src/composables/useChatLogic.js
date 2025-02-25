@@ -82,7 +82,6 @@ export function useChatLogic() {
     };
 
     const formatMessage = (content) => {
-        // console.log(content);
         return DOMPurify.sanitize(marked(content));
     };
 
