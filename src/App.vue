@@ -34,6 +34,13 @@
   color: #2c3e50;
 }
 
+.icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  color: white;
+}
+
 nav {
   padding: 30px;
 }

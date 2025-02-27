@@ -4,7 +4,7 @@ const API_URL = 'https://api.mistral.ai/v1/chat/completions';
 const API_KEY = process.env.VUE_APP_MISTRAL_API_KEY;
 
 async function generateDiseaseDescription(diseaseName) {
-    console.log('generate......');
+    // console.log('generate......');
     try {
         const conversation = [
             { role: 'system', content: 'Anda adalah asisten medis yang memberikan deskripsi singkat tetapi informatif tentang penyakit.' },

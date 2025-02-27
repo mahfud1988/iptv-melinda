@@ -31,11 +31,20 @@ export const usePatientStore = defineStore('patient', {
         }
     },
     actions: {
-        updatePatientDiseaseDescription(id, description) {
-            const patient = this.patients.find(patient => patient.id === id);
+        // updatePatientDiseaseDescription(id, description) {
+        //     const patient = this.patients.find(patient => patient.id === id);
+        //     if (patient) {
+        //         patient.diseaseDescription = description;
+        //     }
+        // }
+        updatePatientDiseaseDescription(patientId, descriptions) {
+            const patient = this.patients.find(p => p.id === patientId);
             if (patient) {
-                patient.diseaseDescription = description;
+              patient.diseaseDescription = [...descriptions]; // Pastikan menggunakan reaktif spread operator
+              console.log("Updated diseaseDescription:", patient.diseaseDescription);
+            }else{
+                console.log("Patient not found!");
             }
-        }
+          }
     }
 });
